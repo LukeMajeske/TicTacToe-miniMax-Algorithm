@@ -53,40 +53,76 @@ def win(board, turn):
     (board['topL']==turn and board['midM']==turn and board['botR']==turn) or
     (board['topR']==turn and board['midM']==turn and board['botL']==turn))
 
-#Minimax algorithm
-def miniMax(cur_board,cur_empty,depth,isMax):
-    totalScore = 0
-
-    cur_board_copy = copy.copy(cur_board)#Copy board as to not modify the original board
-    cur_empty_copy = copy.copy(cur_empty)#Pass on the empty squares on the current board state
-    used = copy.copy(cur_empty)#keep track of squares already moved to as to not reuse them.
+def get_empty(board):
+    #gets all empty squares in the given board state
+    empty = []
+    for square in board:
+        if board[square] == " ":
+            empty.append(square)
     
-    len_empty = len(cur_empty)
-    
-    for i in range(len_empty):
+                              
+    if len(empty) == 0:
+        return 0
+    else:
+        return empty
 
-        move = random.choice(list(used))
-        cur_board_copy[move] = ai_score[isMax][1]
+
+def pos_moves(board,turn):
+    empty = get_empty(board)
+    pos_move =[]
+    board_copy = copy.copy(board)
+    if empty == 0:
+        pos_move.append(board_copy)
+        return pos_move
+    else:
+        for square in empty:
+            board_copy[square] = turn
+            board_pos = copy.copy(board_copy)
+            pos_move.append(board_pos)
+            board_copy[square] = " "
+
+    return pos_move
         
-        isWin = win(cur_board_copy,ai_score[isMax][1])
-        if isWin:  
+#Minimax algorithm
+def miniMax(cur_board,depth,isMax):
+    maxScore= -2000
+    minScore= 2000
+    
+
+    turn = ai_score[isMax][1]
+    cur_board_copy = copy.copy(cur_board)#Copy board as to not modify the original board
+    empty = get_empty(cur_board_copy)
+    pos_move = pos_moves(cur_board_copy, turn)
+    for i in pos_move:
+        #Check if move wins
+        isWin = win(i,ai_score[isMax][1])
+        if isWin:
+            #print('First win')
             return ai_score[isMax][0]
-        elif len(used) == 0:
-            return 0
+        elif empty == 0:
+            return  0
+        
+        scr = miniMax(i,depth+1,not isMax)
+        #print("SCORE")
+        #print(scr)
+        if isMax and (scr > maxScore):
+            maxScore = scr
+            
+            #print('MAXSCORE')
+            #print(maxScore)
+        elif isMax == False and (scr < minScore):
+            minScore = scr
+            #print('MINSCORE')
+            #print(minScore)
+                
+                
+            #totalScore += scr
+    if isMax:
+        return maxScore
+    else:
+        return minScore
 
-        else:
-            try:
-               used.pop(move)
-               cur_empty_copy.pop(move)
-            except KeyError:
-                return 0
-            scr = miniMax(cur_board_copy,cur_empty_copy,depth+1,not isMax)
-            cur_board_copy[move] = " "
-            cur_empty_copy = copy.copy(cur_empty)
-
-            totalScore += scr
-
-    return totalScore
+    
             
 
 #RANDOM AI
@@ -123,10 +159,10 @@ def ticTacAI_Perf():
             bestMove = move
             break
         
-        scr = miniMax(cur_board,cur_empty,0,False)#True=ai turn, False = Human turn
-        
+        scr = miniMax(cur_board,0,False)#True=ai turn, False = Human turn
         cur_empty = copy.copy(emptySquare)
         cur_board[move] = ' '
+        
       
         if scr > bestScore:
             bestScore = scr
@@ -144,7 +180,7 @@ score=[0,0]
 player = 'X'
 computer = 'O'
 turn = 'X'
-ai_score = {True:[1,computer], False:[-1,player], 'tie':0}
+
 
 
 print('Welcome to Tic-Tac-Toe Simulator! Try to beat the computer!\n')
@@ -163,6 +199,7 @@ while True:
     choice = choose_ai_dif()
     first()
     print_board(board)
+    ai_score = {True:[1,computer], False:[-1,player], 'tie':0}
 
     winner = ''
     
@@ -180,6 +217,7 @@ while True:
             emptySquare.pop(move)
         elif choice == 1:
             ticTacAI()
+            print(1)
         else:
             ticTacAI_Perf()
         
