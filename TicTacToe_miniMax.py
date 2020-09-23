@@ -42,7 +42,6 @@ def print_board(board):
     print('\n')
 
 
-#WIN?
 def win(board, turn):
     return ((board['topL']==turn and board['topM']==turn and board['topR']==turn) or
     (board['midL']==turn and board['midM']==turn and board['midR']==turn) or
@@ -131,7 +130,6 @@ def ticTacAI():
     time.sleep(1)
     move = random.choice(list(emptySquare.keys()))
     emptySquare.pop(move)
-    print(move)
     board[move] = computer
 
 
@@ -185,7 +183,15 @@ turn = 'X'
 
 print('Welcome to Tic-Tac-Toe Simulator! Try to beat the computer!\n')
 print('When it\'s your turn to move, type one of the below options to make a move.')
-print('Options are: topL,topM,topR,midL,midM,midR,botL,botM,botR\n')
+print('Options are:')
+print('''
+    |    |
+topL|topM|topR
+----+----+----
+midL|midM|midR
+----+----+----
+botL|botM|botR
+    |    |\n\n''')
 
 
 
